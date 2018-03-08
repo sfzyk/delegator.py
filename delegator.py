@@ -16,7 +16,7 @@ except NameError:
 
 TIMEOUT = 30
 
-def pid_exists(pid):
+def pid_exists(pid):# 判断pid是否存在并且进行相应的错误处理
     """Check whether pid exists in the current process table."""
     if pid == 0:
         # According to "man 2 kill" PID 0 has a special meaning:
@@ -27,6 +27,12 @@ def pid_exists(pid):
         return True
     try:
         os.kill(pid, 0)
+        """
+        man 2 kill
+        If  sig  is 0, then no signal is sent, but error checking is still per‐
+        formed; this can be used to check for the existence of a process ID  or
+        process group ID.
+        """
     except OSError as err:
         if err.errno == errno.ESRCH:
             # ESRCH == No such process
@@ -46,7 +52,7 @@ def pid_exists(pid):
 class Command(object):
 
     def __init__(self, cmd, timeout=TIMEOUT):
-        super(Command, self).__init__()
+        super(Command, self).__init__()   #py3的写法
         self.cmd = cmd
         self.timeout = timeout
         self.subprocess = None
@@ -55,9 +61,13 @@ class Command(object):
         self.__out = None
         self.__err = None
 
-    def __repr__(self):
+    def __repr__(self): #重载__repr__函数的方法 这里调用了下一个对象的__reper__方法，样例如下
+        """
+        "Harold's a clever {0!s}"        # Calls str() on the argument first                
+"Bring out the holy {name!r}"    # Calls repr() on the argument first
+        """
         return '<Command {!r}>'.format(self.cmd)
-
+            
     @property
     def _popen_args(self):
         return self.cmd
@@ -65,9 +75,9 @@ class Command(object):
     @property
     def _default_popen_kwargs(self):
         return {
-            'env': os.environ.copy(),
-            'stdin': subprocess.PIPE,
-            'stdout': subprocess.PIPE,
+            'env': os.environ.copy(), 
+            'stdin': subprocess.PIPE, 
+            'stdout': subprocess.PIPE, 
             'stderr': subprocess.PIPE,
             'shell': True,
             'universal_newlines': True,
@@ -78,8 +88,8 @@ class Command(object):
     def _default_pexpect_kwargs(self):
         encoding = 'utf-8'
         if sys.platform == 'win32':
-            default_encoding = locale.getdefaultlocale()[1]
-            if default_encoding is not None:
+            default_encoding = locale.getdefaultlocale()[1]     ##如果获取到了本地编码方式，就是用本地的 要不就是utf-8
+            if default_encoding is not None:                    ##py语法
                 encoding = default_encoding
         return {
             'env': os.environ.copy(),
