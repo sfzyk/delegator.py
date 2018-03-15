@@ -6,7 +6,7 @@ import sys
 import locale
 import errno
 
-from pexpect.popen_spawn import PopenSpawn
+from pexpect.popen_spawn import PopenSpawn # 强力的第三方库
 
 # Include `unicode` in STR_TYPES for Python 2.X
 try:
@@ -90,7 +90,7 @@ class Command(object):
         if sys.platform == 'win32':
             default_encoding = locale.getdefaultlocale()[1]     ##如果获取到了本地编码方式，就是用本地的 要不就是utf-8
             if default_encoding is not None:                    ##py语法
-                encoding = default_encoding
+                encoding = default_encoding                     ##defaultlocale 第一个是语言 第二个是编码方式
         return {
             'env': os.environ.copy(),
             'encoding': encoding,
@@ -184,7 +184,7 @@ class Command(object):
         """Runs the given command, with or without pexpect functionality enabled."""
         self.blocking = block
 
-        # Use subprocess.
+        # Use subprocess. 如果使用blocking 就是用subprocess
         if self.blocking:
             popen_kwargs = self._default_popen_kwargs.copy()
             popen_kwargs['universal_newlines'] = not binary
@@ -193,7 +193,7 @@ class Command(object):
             if env:
                 popen_kwargs['env'].update(env)
             s = subprocess.Popen(self._popen_args, **popen_kwargs)
-        # Otherwise, use pexpect.
+        # Otherwise, use pexpect. # 否则使用pexpect
         else:
             pexpect_kwargs = self._default_pexpect_kwargs.copy()
             if binary:
